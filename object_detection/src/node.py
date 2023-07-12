@@ -25,6 +25,8 @@ from object_detection.pointprojector    import PointProjector
 from object_detection.objectlocalizer   import ObjectLocalizer
 from object_detection.utils             import *
 
+from csv import writer
+from datetime import datetime
 import warnings
 import time
 warnings.filterwarnings("ignore")
@@ -122,6 +124,15 @@ class Node:
         rospy.loginfo(f"[ObjectDetection Node] If this takes longer than a few seconds, make sure {self.camera_info_topic} is published.")
         camera_info = rospy.wait_for_message(self.camera_info_topic , CameraInfo)
         self.image_info_callback(camera_info)
+
+        # ----- additional saving (team 8)------
+        self.team8_counter = 0
+        self.csv_file_path = '/home/challenge_data/' + str(datetime.now()) + '.csv'
+        with open(self.csv_file_path, 'w') as csv_file: 
+            writer_object = writer(csv_file)
+            header_list = ['timestamp', 'counter', 'class', 'x', 'y', 'z', 'confidence']
+            writer_object.writerow(header_list)
+            csv_file.close()
 
     def image_info_callback(self, camera_info):
         self.optical_frame_id  = camera_info.header.frame_id # "rgbcamera_right_optical_link" 
@@ -247,7 +258,20 @@ class Node:
                 self.detection_info_pub.publish(object_information_array)
                 self.object_point_clouds_pub.publish(point_cloud_array)
                 self.object_detection_img_pub.publish(self.imagereader.cv2_to_imgmsg(object_detection_image, 'bgr8'))
-                
+
+                # save the image if object detected
+                if len(object_detection_result) > 0:
+                    self.team8_counter += 1
+                    filename = "/home/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
+                    cv2.imwrite(filename, object_detection_image)
+                    with open(self.csv_file_path, 'a') as csv_file:
+                        for i in range(len(object_detection_result)):
+                            # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
+                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i],object_pose_array.poses[i].position.x,
+                                     object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z, object_detection_result["confidence"][i]] 
+                            writer_object = writer(csv_file)
+                            writer_object.writerow(data)
+                        csv_file.close()
 
         self.synchronizer.registerCallback(callback)
 
