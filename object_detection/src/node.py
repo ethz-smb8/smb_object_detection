@@ -27,6 +27,9 @@ from object_detection.utils             import *
 
 from csv import writer
 from datetime import datetime
+import tf2_geometry_msgs
+import tf2_ros
+
 import warnings
 import time
 warnings.filterwarnings("ignore")
@@ -151,6 +154,25 @@ class Node:
         else:
             rospy.logerr(" ------------------ camera_info not valid ------------------------")
 
+    def convert_pose_to_map_frame(self, input_pose, stamp):
+            tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration.from_sec(5.0))
+            listener = tf2_ros.TransformListener(tf_buffer)
+
+            pose_stamped = tf2_geometry_msgs.PoseStamped()
+            pose_stamped.pose = input_pose
+            pose_stamped.header.frame_id = self.optical_frame_id
+            pose_stamped.header.stamp = stamp
+
+            msf_frame_id = "world_graph_msf"
+            output_pose_stamped = tf_buffer.transform(pose_stamped, msf_frame_id, rospy.Duration(1.0))
+
+            map_frame_id = "map_o3d"
+            output_pose_stamped.header.stamp = rospy.Time(0)
+            output_pose_stamped = tf_buffer.transform(output_pose_stamped, map_frame_id, rospy.Duration(1.0))
+
+
+            return output_pose_stamped.pose
+    
     def run(self):
 
         def callback(image_msg, lidar_msg):
@@ -267,8 +289,12 @@ class Node:
                     with open(self.csv_file_path, 'a') as csv_file:
                         for i in range(len(object_detection_result)):
                             # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
-                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i],object_pose_array.poses[i].position.x,
-                                     object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z, object_detection_result["confidence"][i]] 
+                            if self.team8_counter==1:
+                                pose_in_final_frame = object_pose_array.poses[i]
+                            else:
+                                pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], pose_in_final_frame.position.x,
+                                     pose_in_final_frame.position.y, pose_in_final_frame.position.z, object_detection_result["confidence"][i]] 
                             writer_object = writer(csv_file)
                             writer_object.writerow(data)
                         csv_file.close()
