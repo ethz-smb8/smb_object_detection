@@ -2,7 +2,7 @@
 
 (CUSTOM) Switch from origin to `ethz-smb8`
 ```bash
-git remote set-url origin https://github.com/ethz-smb8/smb_object_detection.git
+git remote set-url origin git@github.com:ethz-smb8/smb_object_detection.git
 git remote -v
 ```
 
