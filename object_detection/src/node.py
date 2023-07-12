@@ -288,15 +288,12 @@ class Node:
                     filename = "/home/team8/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
                     cv2.imwrite(filename, object_detection_image)
                     with open(self.csv_file_path, 'a') as csv_file:
+                        writer_object = writer(csv_file)
                         for i in range(len(object_detection_result)):
                             # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
-                            if self.team8_counter==1:
-                                pose_in_final_frame = object_pose_array.poses[i]
-                            else:
-                                pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                            pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
                             data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], pose_in_final_frame.position.x,
                                      pose_in_final_frame.position.y, pose_in_final_frame.position.z, object_detection_result["confidence"][i]] 
-                            writer_object = writer(csv_file)
                             writer_object.writerow(data)
                         csv_file.close()
 
