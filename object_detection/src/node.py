@@ -137,6 +137,8 @@ class Node:
             writer_object.writerow(header_list)
             csv_file.close()
         
+        self.csv_file = open(self.csv_file_path, 'a')
+        
         self.tf_buffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.tf_buffer)
 
@@ -287,17 +289,15 @@ class Node:
                     self.team8_counter += 1
                     filename = "/home/team8/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
                     cv2.imwrite(filename, object_detection_image)
-                    with open(self.csv_file_path, 'a') as csv_file:
-                        writer_object = writer(csv_file)
-                        for i in range(len(object_detection_result)):
-                            # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
-                            pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
-                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
-                                    pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
-                                    object_detection_result["confidence"][i],
-                                    object_pose_array.poses[i].position.x, object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z] 
-                            writer_object.writerow(data)
-                        csv_file.close()
+                    writer_object = writer(self.csv_file)
+                    for i in range(len(object_detection_result)):
+                        # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
+                        pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                        data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
+                                pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
+                                object_detection_result["confidence"][i],
+                                object_pose_array.poses[i].position.x, object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z] 
+                        writer_object.writerow(data)
 
         self.synchronizer.registerCallback(callback)
 
