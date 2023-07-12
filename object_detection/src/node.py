@@ -133,7 +133,7 @@ class Node:
         self.csv_file_path = '/home/team8/challenge_data/' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv'
         with open(self.csv_file_path, 'w') as csv_file: 
             writer_object = writer(csv_file)
-            header_list = ['timestamp', 'counter', 'class', 'x', 'y', 'z', 'confidence']
+            header_list = ['timestamp', 'counter', 'class', 'x', 'y', 'z', 'confidence', 'x_camera', 'y_camera', 'z_camera']
             writer_object.writerow(header_list)
             csv_file.close()
         
@@ -292,8 +292,10 @@ class Node:
                         for i in range(len(object_detection_result)):
                             # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
                             pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
-                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], pose_in_final_frame.position.x,
-                                     pose_in_final_frame.position.y, pose_in_final_frame.position.z, object_detection_result["confidence"][i]] 
+                            data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
+                                    pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
+                                    object_detection_result["confidence"][i],
+                                    object_pose_array.poses[i].position.x, object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z] 
                             writer_object.writerow(data)
                         csv_file.close()
 
