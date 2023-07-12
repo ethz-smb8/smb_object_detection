@@ -1,4 +1,12 @@
-# Multimodal Object Detection and Mapping
+# (ETHZ 8finity) Multimodal Object Detection and Mapping 
+
+(CUSTOM) Switch from origin to `ethz-smb8`
+```bash
+git remote set-url origin https://github.com/ethz-smb8/smb_object_detection.git
+git remote -v
+```
+
+---
 
 This package enables detection and localization of objects using camera and lidar inputs. Object detections in 2D images are mapped to lidar scans to retreive the 3D object postions to scale.
 
