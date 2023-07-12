@@ -130,7 +130,7 @@ class Node:
 
         # ----- additional saving (team 8)------
         self.team8_counter = 0
-        self.csv_file_path = '/home/challenge_data/' + str(datetime.now()) + '.csv'
+        self.csv_file_path = '/home/team8/challenge_data/' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv'
         with open(self.csv_file_path, 'w') as csv_file: 
             writer_object = writer(csv_file)
             header_list = ['timestamp', 'counter', 'class', 'x', 'y', 'z', 'confidence']
@@ -164,11 +164,12 @@ class Node:
             pose_stamped.header.stamp = stamp
 
             msf_frame_id = "world_graph_msf"
-            output_pose_stamped = self.tf_buffer.transform(pose_stamped, msf_frame_id, rospy.Duration(1.0))
-
             map_frame_id = "map_o3d"
-            output_pose_stamped.header.stamp = rospy.Time(0)
-            output_pose_stamped = self.tf_buffer.transform(output_pose_stamped, map_frame_id, rospy.Duration(1.0))
+
+            output_pose_stamped = self.tf_buffer.transform(pose_stamped, map_frame_id, rospy.Duration(1.0))
+
+            # output_pose_stamped.header.stamp = rospy.Time(0)
+            # output_pose_stamped = self.tf_buffer.transform(output_pose_stamped, map_frame_id, rospy.Duration(1.0))
 
 
             return output_pose_stamped.pose
@@ -284,7 +285,7 @@ class Node:
                 # save the image if object detected
                 if len(object_detection_result) > 0:
                     self.team8_counter += 1
-                    filename = "/home/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
+                    filename = "/home/team8/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
                     cv2.imwrite(filename, object_detection_image)
                     with open(self.csv_file_path, 'a') as csv_file:
                         for i in range(len(object_detection_result)):
