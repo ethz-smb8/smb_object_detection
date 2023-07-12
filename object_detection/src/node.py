@@ -136,6 +136,9 @@ class Node:
             header_list = ['timestamp', 'counter', 'class', 'x', 'y', 'z', 'confidence']
             writer_object.writerow(header_list)
             csv_file.close()
+        
+        self.tf_buffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tf_buffer)
 
     def image_info_callback(self, camera_info):
         self.optical_frame_id  = camera_info.header.frame_id # "rgbcamera_right_optical_link" 
@@ -154,21 +157,18 @@ class Node:
         else:
             rospy.logerr(" ------------------ camera_info not valid ------------------------")
 
-    def convert_pose_to_map_frame(self, input_pose, stamp):
-            tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration.from_sec(5.0))
-            listener = tf2_ros.TransformListener(tf_buffer)
-
+    def convert_pose_to_map_frame(self, input_pose, stamp):       
             pose_stamped = tf2_geometry_msgs.PoseStamped()
             pose_stamped.pose = input_pose
             pose_stamped.header.frame_id = self.optical_frame_id
             pose_stamped.header.stamp = stamp
 
             msf_frame_id = "world_graph_msf"
-            output_pose_stamped = tf_buffer.transform(pose_stamped, msf_frame_id, rospy.Duration(1.0))
+            output_pose_stamped = self.tf_buffer.transform(pose_stamped, msf_frame_id, rospy.Duration(1.0))
 
             map_frame_id = "map_o3d"
             output_pose_stamped.header.stamp = rospy.Time(0)
-            output_pose_stamped = tf_buffer.transform(output_pose_stamped, map_frame_id, rospy.Duration(1.0))
+            output_pose_stamped = self.tf_buffer.transform(output_pose_stamped, map_frame_id, rospy.Duration(1.0))
 
 
             return output_pose_stamped.pose
