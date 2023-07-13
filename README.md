@@ -9,6 +9,7 @@ git remote -v
 ---
 Run Command
 ```bash
+ntpdate -d 10.0.4.1
 roslaunch object_detection object_detection.launch model_dir_path:='/usr/share/yolo/models'
 ```
 ---
