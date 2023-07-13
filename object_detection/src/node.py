@@ -286,26 +286,26 @@ class Node:
                 img_msg.header = image_msg.header.stamp
                 self.object_detection_img_pub.publish(img_msg)
 
-                # save the image if object detected
-                if len(object_detection_result) > 0:
-                    self.team8_counter += 1
-                    filename = "/home/team8/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
-                    cv2.imwrite(filename, object_detection_image)
-                    writer_object = writer(self.csv_file)
-                    for i in range(len(object_detection_result)):
-                        # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
-                        try:
-                            pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
-                        except:
-                            pose_in_final_frame = Pose()
-                            pose_in_final_frame.position.x = 0
-                            pose_in_final_frame.position.y = 0
-                            pose_in_final_frame.position.z = 0
-                        data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
-                                pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
-                                object_detection_result["confidence"][i],
-                                object_pose_array.poses[i].position.x, object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z] 
-                        writer_object.writerow(data)
+                # # save the image if object detected
+                # if len(object_detection_result) > 0:
+                #     self.team8_counter += 1
+                #     filename = "/home/team8/challenge_data/object_images/"+str(image_msg.header.stamp)+"_"+str(self.team8_counter).zfill(6)+".jpg"
+                #     cv2.imwrite(filename, object_detection_image)
+                #     writer_object = writer(self.csv_file)
+                #     for i in range(len(object_detection_result)):
+                #         # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
+                #         try:
+                #             pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                #         except:
+                #             pose_in_final_frame = Pose()
+                #             pose_in_final_frame.position.x = 0
+                #             pose_in_final_frame.position.y = 0
+                #             pose_in_final_frame.position.z = 0
+                #         data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
+                #                 pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
+                #                 object_detection_result["confidence"][i],
+                #                 object_pose_array.poses[i].position.x, object_pose_array.poses[i].position.y, object_pose_array.poses[i].position.z] 
+                #         writer_object.writerow(data)
 
         self.synchronizer.registerCallback(callback)
 
