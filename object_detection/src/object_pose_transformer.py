@@ -78,7 +78,7 @@ class SaverNode:
 
         return output_pose_stamped.pose
 
-    def prepare_and_save_data(object_poses_in_frame, object_detection_image, detection_infos):
+    def prepare_and_save_data(self, object_poses_in_frame, object_detection_image, detection_infos):
         raw_image_stamp = object_detection_image.header.stamp
         # save the image if object detected
         if len(object_poses_in_frame) > 0:
