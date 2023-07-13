@@ -7,7 +7,11 @@ git remote -v
 ```
 
 ---
-
+Run Command
+```bash
+roslaunch object_detection object_detection.launch model_dir_path:='/usr/share/yolo/models'
+```
+---
 This package enables detection and localization of objects using camera and lidar inputs. Object detections in 2D images are mapped to lidar scans to retreive the 3D object postions to scale.
 
 For the object detection, the package utilizes [yolov5](https://github.com/ultralytics/yolov5).
