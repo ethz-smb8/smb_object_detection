@@ -3,7 +3,7 @@ import rospkg
 
 import message_filters as mf
 
-from sensor_msgs.msg import Image, PointCloud2, CameraInfo
+from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray, Pose, Quaternion
 
 
@@ -35,9 +35,12 @@ class Node:
         self.object_poses_sub = mf.Subscriber(self.object_poses_sub, PoseArray, queue_size=10)
         self.detection_info_sub = mf.Subscriber(self.detection_info_sub, PoseArray, queue_size=10)
         
-        self.synchronizer= mf.ApproximateTimeSynchronizer([ self.camera_sub, self.lidar_sub], 
-                                                          self.camera_lidar_sync_queue_size,  
-                                                                               self.camera_lidar_sync_slop)
+        queue_size=10
+        sync_slop = 0.05
+        self.synchronizer= mf.ApproximateTimeSynchronizer([ self.detections_image_sub,
+                                                           self.object_poses_sub,
+                                                           self.detection_info_sub], 
+                                                          queue_size, sync_slop)
 
         self.imagereader = CvBridge()
 
