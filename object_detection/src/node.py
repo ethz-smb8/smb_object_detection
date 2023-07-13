@@ -139,7 +139,7 @@ class Node:
         
         self.csv_file = open(self.csv_file_path, 'a')
         
-        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_buffer = tf2_ros.Buffer(rospy.Duration(12.0))
         self.listener = tf2_ros.TransformListener(self.tf_buffer)
 
     def image_info_callback(self, camera_info):
