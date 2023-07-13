@@ -294,7 +294,13 @@ class Node:
                     writer_object = writer(self.csv_file)
                     for i in range(len(object_detection_result)):
                         # ['timestamp','counter', 'class', 'x', 'y', 'z', 'confidence']
-                        pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                        try:
+                            pose_in_final_frame = self.convert_pose_to_map_frame(object_pose_array.poses[i], image_msg.header.stamp)
+                        except:
+                            pose_in_final_frame = Pose()
+                            pose_in_final_frame.position.x = 0
+                            pose_in_final_frame.position.y = 0
+                            pose_in_final_frame.position.z = 0
                         data = [image_msg.header.stamp, self.team8_counter, object_detection_result["name"][i], 
                                 pose_in_final_frame.position.x, pose_in_final_frame.position.y, pose_in_final_frame.position.z,
                                 object_detection_result["confidence"][i],
