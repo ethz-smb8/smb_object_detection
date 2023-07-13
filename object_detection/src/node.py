@@ -282,7 +282,9 @@ class Node:
                 self.object_pose_pub.publish(object_pose_array)
                 self.detection_info_pub.publish(object_information_array)
                 self.object_point_clouds_pub.publish(point_cloud_array)
-                self.object_detection_img_pub.publish(self.imagereader.cv2_to_imgmsg(object_detection_image, 'bgr8'))
+                img_msg = self.imagereader.cv2_to_imgmsg(object_detection_image, 'bgr8')
+                img_msg.header = image_msg.header.stamp
+                self.object_detection_img_pub.publish(img_msg)
 
                 # save the image if object detected
                 if len(object_detection_result) > 0:
