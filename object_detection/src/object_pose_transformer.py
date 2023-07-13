@@ -109,6 +109,8 @@ class SaverNode:
     def run(self):
         def callback(detection_image_msg, object_poses_msg, detection_info_msg):
             callback_start = time.time()
+            rospy.loginfo("I am in the code.")
+
             if len(object_poses_msg) > 0: # if some object detected
                 self.prepare_and_save_data(object_poses_in_frame=object_poses_msg,
                                             object_detection_image=detection_image_msg,
